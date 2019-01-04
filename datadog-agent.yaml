@@ -18,6 +18,7 @@ spec:
             name: dogstatsdport
             protocol: UDP
           - containerPort: 8126
+            hostPort: 8126
             name: traceport
             protocol: TCP
         env:
@@ -32,6 +33,19 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.hostIP
+          # Logs
+          - name: DD_LOGS_ENABLED
+            value: "true"
+          - name: DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL
+            value: "true"
+          - name: DD_PROCESS_AGENT_ENABLED
+            value: "true"
+          # APM
+          - name: DD_APM_ENABLED
+            value: "true"
+          # For Trace Search
+          - name: DD_APM_ANALYZED_SPANS
+            value: "my-flask-app|flask.request=1,postgres_service|postgres.query=1"
         resources:
           requests:
             memory: "256Mi"
@@ -47,6 +61,14 @@ spec:
             readOnly: true
           - name: cgroups
             mountPath: /host/sys/fs/cgroup
+            readOnly: true
+          - name: flasklogs
+            mountPath: /var/log/flask
+            readOnly: true
+          - name: vol-datadog-confd
+            mountPath: /conf.d
+          - name: passwd
+            mountPath: /etc/passwd
             readOnly: true
         livenessProbe:
           exec:
@@ -64,3 +86,12 @@ spec:
         - hostPath:
             path: /sys/fs/cgroup
           name: cgroups
+        - hostPath:
+            path: /var/log/flask
+          name: flasklogs
+        - name: vol-datadog-confd
+          configMap:
+            name: cm-datadog-confd
+        - hostPath:
+            path: /etc/passwd
+          name: passwd
