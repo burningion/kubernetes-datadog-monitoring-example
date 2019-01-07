@@ -29,4 +29,26 @@ If you don't see it show up, ensure you've copied and pasted the proper Datadog 
 
 ## Running the Application
 
-TODO
+If you're running this repo in minkube, you'll need to first give minikube access to the local Docker images. You can do this via a:
+
+```bash
+$ eval $(minikube docker-env)
+```
+
+With this, you're then be able to build Docker images locally, and pull them with the included yaml files. 
+
+Here, we assume you're in the repo's top level directory to build the Postgres image:
+
+```bash
+$ docker build -t sample_postgres:latest ./postgres/
+$ kubectl apply -f postgres_deploy.yaml
+```
+
+And you can check to see that everything went well:
+
+```bash
+$ $ kubectl get pods
+NAME                        READY     STATUS    RESTARTS   AGE
+datadog-agent-5hs6s         1/1       Running   0          2d
+postgres-59f87896b6-hnjtp   1/1       Running   0          1m
+```
