@@ -1,7 +1,7 @@
 # Kubernetes Example Datadog Monitoring Project
 
 
-This repo is a **WORK IN PROGRESS**. It will contain a basic example of how to set up and monitor a kubernetes application with Datadog.
+This repo contains a basic example of how to set up and monitor a kubernetes application with Datadog.
 
 ## Getting Started 
 
