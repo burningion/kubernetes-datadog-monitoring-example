@@ -28,6 +28,10 @@ spec:
               fieldPath: status.hostIP
         - name: DD_AGENT_SERVICE_PORT
           value: '8126'
+        - name: DOGSTATSD_HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
       volumes:
         - hostPath:
             path: /var/log/flask

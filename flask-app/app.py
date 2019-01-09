@@ -8,6 +8,11 @@ from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey
 from sqlalchemy.sql import select
 
 
+# dogstatsd is called datadog
+from datadog import initialize, statsd
+initialize(statsd_host=os.environ['DOGSTATSD_HOST_IP'], statsd_port=8125)
+statsd.increment('flaskapp.times.started')
+
 from flask import Flask
 
 
@@ -47,6 +52,7 @@ import logging
 import json_log_formatter
 import threading
 
+logging.basicConfig()
 formatter = json_log_formatter.JSONFormatter()
 json_handler = logging.FileHandler(filename='/var/log/flask/mylog.json')
 json_handler.setFormatter(formatter)
@@ -57,7 +63,8 @@ logger.setLevel(logging.INFO)
 
 @app.route('/')
 def hello_world():
-    return 'Hello, World!'
+    statsd.increment('web.page_views')
+    return 'Hello, World! I\'ve incremented the web.pageviews Dogstatsd metric!'
 
 @app.route('/log')
 def log_endpoint():
@@ -89,4 +96,4 @@ def bad():
     return 'Flask has been kuberneted \n'.format(g)
 
 if __name__ == '__main__':
-  app.run(debug=True,host='0.0.0.0',port=5005)
+  app.run(host='0.0.0.0',port=5005)
