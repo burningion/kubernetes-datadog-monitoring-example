@@ -25,7 +25,7 @@ tracer.configure(
     port=os.environ['DD_AGENT_SERVICE_PORT'],
 )
 
-patch(sqlalchemy=True)
+patch(sqlalchemy=True,logging=True)
 
 app = Flask(__name__)
 
@@ -52,7 +52,12 @@ import logging
 import json_log_formatter
 import threading
 
-logging.basicConfig()
+# for correlating logs and traces
+FORMAT = ('%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] '
+          '[dd.trace_id=%(dd.trace_id)s dd.span_id=%(dd.span_id)s] '
+          '- %(message)s')
+logging.basicConfig(format=FORMAT)
+
 formatter = json_log_formatter.JSONFormatter()
 json_handler = logging.FileHandler(filename='/var/log/flask/mylog.json')
 json_handler.setFormatter(formatter)
@@ -68,6 +73,7 @@ def hello_world():
 
 @app.route('/log')
 def log_endpoint():
+    statsd.increment('web.page_views')
     my_thread= threading.currentThread().getName()
     time.sleep(0.01)
     logger.info('log_endpoint should be making logs', 
@@ -83,6 +89,7 @@ def log_endpoint():
 
 @app.route('/query')
 def return_results():
+    statsd.increment('web.page_views')
     conn = con.connect()
     s = select([web_origins])
     result = conn.execute(s)
@@ -92,6 +99,7 @@ def return_results():
 
 @app.route('/bad')
 def bad():
+    statsd.increment('web.page_views')
     # this will break because variable g doesn't exist
     return 'Flask has been kuberneted \n'.format(g)
 
