@@ -47,8 +47,26 @@ $ kubectl apply -f postgres_deploy.yaml
 And you can check to see that everything went well:
 
 ```bash
-$ $ kubectl get pods
+$ kubectl get pods
 NAME                        READY     STATUS    RESTARTS   AGE
 datadog-agent-5hs6s         1/1       Running   0          2d
 postgres-59f87896b6-hnjtp   1/1       Running   0          1m
 ```
+
+Next, we can build and deploy the Flask application, and check to see its url:
+
+```bash
+$ docker build -t docker build -t sample_flask:latest ./flask-app/
+$ kubectl apply -f flask_deploy.yaml
+$ kubectl get services
+NAME         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+flaskapp     NodePort    10.104.83.93    <none>        5005:31924/TCP   1d
+kubernetes   ClusterIP   10.96.0.1       <none>        443/TCP          4d
+postgres     ClusterIP   10.108.98.243   <none>        5432/TCP         2d
+$ minikube service flaskapp --url
+http://192.168.99.100:31924
+```
+
+Your url may be different than the one above. By clicking the URL, you should be able to access the Flask app from your host machine.
+
+
