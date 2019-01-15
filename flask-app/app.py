@@ -2,6 +2,7 @@
 import os
 import time
 import random
+
 #postgres libraries
 import sqlalchemy
 from sqlalchemy import Table, Column, Integer, String, MetaData, ForeignKey
@@ -90,12 +91,13 @@ def log_endpoint():
 @app.route('/query')
 def return_results():
     statsd.increment('web.page_views')
-    conn = con.connect()
-    s = select([web_origins])
-    result = conn.execute(s)
-    row = result.fetchone()
-    conn.close()
-    return str(row) + '\n'
+    res = con.execute(select([web_origins])).fetchall()
+    logger.info(res,
+        extra={
+            'job_category': 'hello_world', 
+            'logger.name': 'my_json'
+        })
+    return str(res[0][1]) + '\n'
 
 @app.route('/bad')
 def bad():

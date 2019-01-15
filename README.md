@@ -35,7 +35,9 @@ If you're running this repo in minkube, you'll need to first give minikube acces
 $ eval $(minikube docker-env)
 ```
 
-With this, you're then be able to build Docker images locally, and pull them with the included yaml files. 
+With this, you're then be able to build Docker images locally, and pull them with the included yaml files. Note that if you restart your computer, or open another shell, you will need to re-enter the above command to link the locally built containers.
+
+If you try rebuilding your container, and don't see changes, make sure you've run the above command, followed by rebuilding your containers. You can then delete the running pods to reinsert the newest container images into your cluster.
 
 Here, we assume you're in the repo's top level directory to build the Postgres image:
 
